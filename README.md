@@ -1,93 +1,128 @@
+# OCR based Medical Data Extraction Project
 
-# PillChime - Never Miss a Dose!
+## Problem statement
+There are a lot of procedures needs to followed by the health insurance companies as per the government regulation to issue the claims, for that the insurance company has to process the images of patient details and prescription sent by hospitals or induvial doctors and extract useful data from them. For these process, the most insurance companies outsource workforce from companies like “Mr. X data Analytics” to extract the information from images manually.
 
-This is an easy, quick and one-stop solution to tracking medication dosages. In this repository, we have developed a system that integrates itself with [Google Home](https://home.google.com/welcome/), using the [Google Cloud Console](https://console.cloud.google.com/welcome/new?pli=1) utility.  
-Similarly, we also link it with [Amazon Alexa](https://alexa.amazon.com/) using the [Amazon Developer Console](https://developer.amazon.com/).
+Mr. X data Analytics uses a software, which will show the scanned images of patient details or prescription, the person needs to type the information by seeing the image manually in the the right side column and select the type of information . As it is a manual process, error will be common and dealing with the huge set of images like in the pandemic time, will not be possible with the same amount of workforce. As well the Insurance companies has requested to send the data within 24hrs when it is send for extraction. All of these constraints forced, Mr. X data Analytics to consider for a software upgrade from their old software.
 
-This projects implements an optimized [LangChain](https://www.langchain.com/) pipeline, which makes use of the latest open-source large language model [Llama3 : 8b](https://ai.meta.com/blog/llama-3-2-connect-2024-vision-edge-mobile-devices/), along with open-source [PaddleOCR](https://github.com/PaddlePaddle/PaddleOCR). 
+## Solution approach
+To solve all these problems, we are building a program which can do the extraction of data from images automatically. As always, machines can not replace humans. A person will recheck the extracted data and submit. So, that it will save a tremendous amount which was taken to type the data manually.
 
-The user is required to simply upload an image of a medical prescription, and PillChime will automatically set up reminder schedules in your default calendar application.
+Here, we are using the Python programming language and pytesseract google library for extracting the data and Regex module to process the data and get distilled desired output.
 
-## Architecture
+## Technologies used
+* Python <br />
+* oops <br />
+* Pdf2image module <br />
+* Opencv <br />
+* pytesseract <br />
+* Regular expression <br />
+* pytest <br />
+* Postman <br />
+* FastApi <br />
 
-The following is PillChime's HLD, that describes it's control flow and architecure:
-![Alt text](readme_dependencies/arch.jpeg)
+## Workflow
+![workflow](https://user-images.githubusercontent.com/108637079/188907761-18938235-c9f4-42b5-945b-83279bebcb8c.jpg)
+
+## PDF to Image
+For converting PDF to image, we have used pdf2image library.
+
+## Without preprocessing extracting data
+Tried extracting data from source files without any processing, as they are not in proper format to be extracted, the extracted data was not as expected.
+
+![dark_image](https://user-images.githubusercontent.com/108637079/188908642-2c7a5a18-1d0d-4b99-ada3-8aa3e501a14b.jpg)
+
+## Extracted data from the above image
+    
+
+      Dr John Smith, M.D
+      2 Non-Important Street,
+      New York, Phone (000)-111-2222
+
+      Name: Maria Sharapova Date: 5/11/2022
+
+      Address: 9 tennis court, new Russia, DC
+
+      —momennannenncmneneunnmnnnnninsissiyoinnitnahaadaanih issn earnttneenrenen:
+
+      Prednisone 20 mg
+      Lialda 2.4 gram
+
+      3 days,
+
+      or 1 month
+
+## Image processing
+we decided to preprocess the image using opencv module, before extracting data from them. For that we have first used normal thresholding and checked, which resulted in below image
+
+![filter_dark](https://user-images.githubusercontent.com/108637079/188912143-09f9894c-4553-4396-bd48-0cfd21206e7c.jpg)
+
+So, if there is any shadow or some noise, the normal thresholding fade out the area. which will result in loss of data.
+
+In the search of better approach of this problem, we have decided to use adaptive thresholding technique. In this technique, the image will be divided into sub image and the thresholding value will be different for all sub regions. And the end result of adaptive thresholding is much better compared to normal thresholding.
+
+![adaptive_filter_dark](https://user-images.githubusercontent.com/108637079/188912282-4bc8fde3-81e0-401c-b75c-557e990e2d01.jpg)
+
+## After preprocessing the image data extraction
+
+      Dr John Smith, M.D
+      2 Non-Important Street,
+      New York, Phone (000)-111-2222
+      
+      Name: Marta Sharapova Date: 5/11/2022
+      
+      Address: 9 tennis court, new Russia, DC
+      
+      K
+      
+      Prednisone 20 mg
+      Lialda 2.4 gram
+      
+      Directions:
+      
+      Prednisone, Taper 5 mg every 3 days,
+      Finish in 2.5 weeks a
+      Lialda - take 2 pill everyday for 1 month
+      
+## Notebook
+For all these above trials, used jupyter books and developed the small bits of the functionalities., which can be used later while designing the class.
+
+[Notebooks](https://github.com/MirzaWaleed95/Data_Extraction_Project/tree/main/backend/notebooks)
+      
+## OOPS design
+The code was written in using OOPs concepts for extracting the medical data from prescription and patient details documents.
+
+[Code](https://github.com/MirzaWaleed95/Data_Extraction_Project/tree/main/backend/src)
+
+## Regular expression
+Using regular expression module we can match the patterns and extract the data we want from the files. For this project, analyst the medical files and as fact all the medical documents will follow same pattern, we wrote patterns that match only the required data. Before writing the python code, It is advisable to practise and match the patterns in regex 101 website.
+
+[regex101](https://regex101.com/)
+
+## Test driven Development
+In this project test driven development methodology was used to develop the code. For testing pytest module was used. For all the methods and final result the test cases was designed and checked simultaneously while developing the code.
+
+[Test Cases](https://github.com/MirzaWaleed95/Data_Extraction_Project/tree/main/backend/tests)
+
+## FastApi
+Used FastAPI for hosting the server of the project. FastApi, as name suggest is help us to develop fast and some other advantages are,
+
+* In build Data validation <br/>
+* In build Documentation <br/>
+* Fast running and performance <br/>
+
+## Postman
+As it is a backend project, not developed frontend part. For checking how the server responds for http requests, used postman to trigger http requests and tested the outcome.
+
+<img width="509" alt="postman_image" src="https://user-images.githubusercontent.com/108637079/188928733-bae5b7a2-028e-4d07-81ec-838ff7c166d8.PNG">
 
 
-One of the key features of our pipeline is that user data is always protected by a multi-layer protocol.
-## PillChime Pipeline
-
-In this section, we will walk through the PillChime Pipeline, and review content at various stages.
-
-**1. Upload Image of the Prescription**
-
-Consider the following medical prescription as an example:
-
-![Alt text](readme_dependencies/presc.jpeg)
-
-We have re-trained a version of [PaddleOCR](https://github.com/PaddlePaddle/PaddleOCR) by using the method of **Partial-Layered Weights Freezing (PLWF)**, by adding a **temperature parameter** to **weight-decay** during training.
-
-![Alt text](readme_dependencies/wt_decay.jpg)
-
-L : Total loss function.
-
-𝑇 : Temperature parameter for normalization.
-
-𝑊𝑖 : Weights for layer (𝑖)
-
-𝜆 : Weight decay factor for non-frozen layers.
-𝛼 : Reduced weight decay factor for frozen layers (or partial freezing).
-
-𝐼(𝑓(𝑖)) : Indicator function that equals 1 if layer 𝑖 is frozen and 0 otherwise.
-
-∥𝑊𝑖∥ * ∥𝑊𝑖∥ : Squared ℓ2 to ℓ2 normal decay.
 
 
+## Result
+This backend functionality can be integrated into the Mr.X Analytics existing software and data can be extracted automatically. The extracted data may have some errors, the person who is performing the work has to correct it and submit the response.
 
-
-**2. Recongise and Parse Text**
-
-The following are the text boxes generated on that prescription.
-
-![Alt text](readme_dependencies/boxed_presc.jpeg)
-
-The OCR model is able to recognise all the text within this, and presents the following string:
-
-```bash
-  "aon py Dr. Prashant V. Bhandari sports injury MBBS, DNB (Ortho), MNAMS Consulting Orthopaedic & Arthroscopy Surgeon Y Fellow - Arthroscopy and Sports Medicine Knee (ISAKOS) BHANDART'S CLINIC Fellow -Shouder and Elbow Surgery (apanSingaore) Reg, No. 20010572235 Mob. 9923699699 Sachs Patan\ar iZl— Sica Clo Rain | incrablin Qyn ce Ilo Fa\l No Kye PwlRT hyn Cle, 5 Www ace 1S Wey ao Rey =e Quen gt 20° WAC nan eae gv Ao> Dawe & Yous sag = Pot Deu - Van \Vadsur - ve NO DWE ER 25) en ee re ACL IWNcuFR CI eNyY YY ie AaAv Cusge ee Aer Recum schon WM 3. KO heer i iail.com Clinic : 8329733343 Email: drprashant bhandari@gm: ¢ No. 106, 1st FI PI Bibwewadi, Pune 411037. it i, a 406, 1st Floor, Ganga Collidium II, Near Gangadham Phase 1, Bi Office No. 106, i imins i tment only) 19 : Monday to Saturday - 5.30 pm. - 8.30 pm (By prior appoint"
-```
-
-**3. Obtain JSON prescription from Llama3.2**
- 
-After this, we route this string to [Llama3:8b](https://ai.meta.com/blog/), with a custom prompt.
-
-Upon parsing this, Llama produces the following JSON strin that contains the prescription.
-
-```json
-{{
-  "patient": {
-    "name": "Sachi Patankar",
-    "age": 18,
-    "gender": "female",
-    "prescribedBy": "Dr. Bhandari"
-  },
-  "prescription": [
-    {
-      "medicine": "Hm. CoA Tablet Painkiller",
-      "dosage": "1",
-      "timing": ["before lunch"]
-    }
-  ]
-}
-```
-
-**4. Return JSON prescription to Client-Side API**
-
-Llama runs **on-device** with **GPU Hardware Acceleration**, using the **Ollama CLI** utility. We use [Flask](https://flask.palletsprojects.com/en/2.0.x/deploying/) to create API utility, and service our **React front-end**. We have also used [MongoDB](https://www.mongodb.com/) to store user data in a protected way.
-
-## Authors
-
-[Aarya Bhave](https://www.linkedin.com/in/aarya-bhave-aa4a13256/?originalSubdomain=in)
-[Shubham Shinde](https://www.linkedin.com/in/shubhamshinde6762/)
-[Advait Joshi](https://www.linkedin.com/in/joshiadvait/)
-[Sachi Patankar](https://www.linkedin.com/in/sachi-patankar-33549b245/)
+## Benefits
+* Mr.X Analytics can save at least of 30 secs for each document. It is small amount of time when looking for one document, but cumulatively it can save a tremendous amount of time which can help the company to complete more documents within the given time and make more profit <br/>
+* The company doesn't have to hire extra people in the season time. <br/>
+* As it is a combination of automation and manual the error will be very much low. <br/>
