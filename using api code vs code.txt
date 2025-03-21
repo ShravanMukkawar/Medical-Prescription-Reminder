@@ -1,0 +1,88 @@
+import os
+import cv2
+import pytesseract
+import requests
+import spacy
+import numpy as np
+import streamlit as st
+from PIL import Image
+
+# 🔹 Configure Tesseract OCR path (Ensure Tesseract is installed)
+pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
+
+# 🔹 Load NLP model
+nlp = spacy.load("en_core_web_sm")
+
+# 🔹 API Configuration (New API Key & Host)
+RAPIDAPI_KEY = "77a97fa331mshb5b64a725b65001p1ba2fbjsnc3f8537a919a"  # Replace with actual key
+API_HOST = "drug-info-and-price-history.p.rapidapi.com"
+
+# 🔹 Function to fetch medicine price
+def get_medicine_price(medicine_name):
+    url = f"https://{API_HOST}/1/druginfo?drug={medicine_name.strip()}"  # Correct endpoint
+    headers = {
+        "X-RapidAPI-Key": RAPIDAPI_KEY,
+        "X-RapidAPI-Host": API_HOST
+    }
+    
+    try:
+        response = requests.get(url, headers=headers)
+        response.raise_for_status()
+
+        data = response.json()
+        if data and "price" in data:
+            return float(data["price"])  # Ensure it's a float
+        else:
+            return None  # No price found
+    
+    except requests.exceptions.HTTPError as e:
+        return f"API Error: {e}"
+
+# 🔹 Updated `verify_bill` Function (Handles Errors)
+def verify_bill(medicines, actual_bill):
+    expected_total = 0
+    medicine_prices = {}
+
+    for med in medicines:
+        price = get_medicine_price(med)
+        if isinstance(price, float):  # Only add if it's a valid number
+            medicine_prices[med] = price
+            expected_total += price
+        else:
+            medicine_prices[med] = "Not Found"
+
+    difference = actual_bill - expected_total
+    return expected_total, difference, medicine_prices
+
+# 🔹 Run Streamlit App
+st.title("🩺 Medical Bill Verification System")
+uploaded_file = st.file_uploader("Upload Prescription Image", type=["png", "jpg", "jpeg"])
+
+if uploaded_file is not None:
+    image = Image.open(uploaded_file)
+    st.image(image, caption="Uploaded Prescription", use_column_width=True)
+
+    # Extract text
+    extracted_text = pytesseract.image_to_string(np.array(image))
+    medicines_list = list(set([med.strip() for med in extracted_text.split("\n") if med.strip()]))
+
+    st.write("Detected Medicines:", medicines_list)
+
+    actual_bill = st.number_input("Enter the actual bill amount", min_value=0.0, format="%.2f")
+
+    if st.button("Verify Bill"):
+        expected_total, difference, medicine_prices = verify_bill(medicines_list, actual_bill)
+
+        st.write("### Price Details:")
+        for med, price in medicine_prices.items():
+            st.write(f"**{med}:** {price} USD")
+
+        st.write(f"### Expected Bill: {expected_total:.2f} USD")
+        st.write(f"### Actual Bill: {actual_bill:.2f} USD")
+
+        if abs(difference) < 0.01:
+            st.success("✅ The bill is correct!")
+        elif difference > 0:
+            st.warning(f"⚠ The actual bill is **{difference:.2f} USD higher** than expected!")
+        else:
+            st.warning(f"⚠ The actual bill is **{-difference:.2f} USD lower** than expected!")

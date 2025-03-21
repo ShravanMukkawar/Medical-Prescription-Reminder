@@ -1,5 +1,5 @@
-import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom'
-import Prescription from './components/prescription'
+import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
+import Prescription from './components/prescription';
 
 function App() {
   return (
@@ -10,7 +10,7 @@ function App() {
         </Routes>
       </div>
     </Router>
-  )
+  );
 }
 
-export default App
+export default App;
