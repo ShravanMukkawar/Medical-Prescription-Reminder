@@ -15,14 +15,14 @@ project-root/
 
 ### 1️⃣ Frontend Setup (Port 5173)
 
-cd client
-npm install --force
-npm run dev
+1.cd client
+2.npm install --force
+3.npm run dev
 
 2️⃣ Node.js Backend for Mail (Port 7000)
-cd ../server
-npm install
-npm start
+1.cd ../server
+2.npm install
+3.npm start
 
 3️⃣ Python Backend for Image Processing (Port 8000)
 
