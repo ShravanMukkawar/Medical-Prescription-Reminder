@@ -9,6 +9,7 @@ function Prescription() {
     const [medicationDetails, setMedicationDetails] = useState(null);
     const [showEmailForm, setShowEmailForm] = useState(false);
     const [email, setEmail] = useState("");
+    const [phone, setPhone] = useState(""); // Added phone state
     const [sendingEmail, setSendingEmail] = useState(false);
     const [emailSent, setEmailSent] = useState(false);
 
@@ -103,9 +104,19 @@ function Prescription() {
         setEmail(e.target.value);
     };
 
+    // Added phone handler
+    const handlePhoneChange = (e) => {
+        setPhone(e.target.value);
+    };
+
     const handleSendReminders = async () => {
         if (!email || !email.includes('@')) {
             alert("Please enter a valid email address.");
+            return;
+        }
+
+        if (!phone) {
+            alert("Please enter a phone number.");
             return;
         }
 
@@ -120,18 +131,19 @@ function Prescription() {
                 },
                 body: JSON.stringify({
                     email: email,
+                    phone: phone, // Send phone number to backend
                     medications: medicationDetails,
                 }),
             });
 
             if (!response.ok) {
-                throw new Error("Failed to send email reminders");
+                throw new Error("Failed to send reminders");
             }
             
             setEmailSent(true);
-            alert("Medication reminders have been set up successfully! You will receive email notifications based on your prescription schedule.");
+            alert("Medication reminders have been set up successfully! You will receive email and SMS notifications based on your prescription schedule.");
         } catch (error) {
-            console.error("Error sending email reminders:", error);
+            console.error("Error sending reminders:", error);
             alert("Failed to set up reminders. Please try again later.");
         } finally {
             setSendingEmail(false);
@@ -228,11 +240,11 @@ function Prescription() {
                                 {loading ? "Processing..." : "Verify Prescription"}
                             </button>
                             
-                            {/* Email Reminder Section */}
+                            {/* Email and Phone Reminder Section */}
                             <div className="bg-white rounded-lg shadow-md p-6">
                                 <h4 className="text-lg font-semibold text-gray-800 mb-2">Set Up Medication Reminders</h4>
                                 <p className="text-gray-600 mb-4">
-                                    Never miss a dose! We'll send you timely reminders based on your prescribed medications.
+                                    Never miss a dose! We'll send you timely reminders via email and SMS based on your prescribed medications.
                                 </p>
                                 
                                 <div className="mb-4">
@@ -247,6 +259,19 @@ function Prescription() {
                                     />
                                 </div>
                                 
+                                {/* Added Phone Number Field */}
+                                <div className="mb-4">
+                                    <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">Mobile Phone Number</label>
+                                    <input 
+                                        id="phone"
+                                        type="tel"
+                                        placeholder="+1 (123) 456-7890" 
+                                        value={phone}
+                                        onChange={handlePhoneChange}
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                    />
+                                </div>
+                                
                                 <div className="flex items-center mb-4">
                                     <input 
                                         id="consent"
@@ -255,7 +280,7 @@ function Prescription() {
                                         defaultChecked
                                     />
                                     <label htmlFor="consent" className="ml-2 text-sm text-gray-700">
-                                        I consent to receive email reminders about my medication
+                                        I consent to receive email and SMS reminders about my medication
                                     </label>
                                 </div>
                                 
@@ -274,7 +299,7 @@ function Prescription() {
                                             alt="Success Icon" 
                                             className="mr-2 h-6 w-6"
                                         />
-                                        <span>Reminders set up successfully! You'll receive timely notifications based on your medication schedule.</span>
+                                        <span>Reminders set up successfully! You'll receive timely notifications via email and SMS based on your medication schedule.</span>
                                     </div>
                                 )}
                             </div>
